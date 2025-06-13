@@ -1,0 +1,22 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 40px;
+}
+#game-board table {
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+#game-board td {
+    padding: 0;
+}
+#game-board button {
+    width: 80px;
+    height: 80px;
+    font-size: 2em;
+    cursor: pointer;
+}
+#current-player {
+    margin: 20px;
+    font-size: 1.2em;
+}
