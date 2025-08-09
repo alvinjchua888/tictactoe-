@@ -5,11 +5,21 @@
     <title>Tic-Tac-Toe</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script>
+        /**
+         * Fetch the current game state from the server
+         * @returns {Promise<Object>} Game state object
+         */
         async function fetchState() {
             const res = await fetch("/get_state");
             return await res.json();
         }
 
+        /**
+         * Send a move to the server
+         * @param {number} row - Row index (0-2)
+         * @param {number} col - Column index (0-2)
+         * @returns {Promise<Object>} Server response with success status and game state
+         */
         async function makeMove(row, col) {
             const res = await fetch("/move", {
                 method: "POST",
@@ -19,38 +29,62 @@
             return await res.json();
         }
 
+        /**
+         * Reset the game to initial state
+         */
         async function resetGame() {
             await fetch("/reset", { method: "POST" });
             updateBoard();
         }
 
+        /**
+         * Update the display of a specific cell
+         * @param {number} row - Row index (0-2)
+         * @param {number} col - Column index (0-2)
+         * @param {string} value - Cell value ('X', 'O', or '')
+         */
         function updateCell(row, col, value) {
             document.getElementById(`cell-${row}-${col}`).textContent = value;
         }
 
+        /**
+         * Update the entire game board display and current player status
+         */
         async function updateBoard() {
             const state = await fetchState();
+            
+            // Update all cells on the board
             for (let r = 0; r < 3; r++) {
                 for (let c = 0; c < 3; c++) {
                     updateCell(r, c, state.board[r][c]);
                 }
             }
+            
+            // Update game status display
             document.getElementById("current-player").textContent = 
                 state.winner ? 
                 (state.winner === "Draw" ? "Draw!" : `Winner: ${state.winner}`) : 
                 `Current: ${state.current}`;
         }
 
+        /**
+         * Handle cell click events
+         * @param {number} row - Row index (0-2)
+         * @param {number} col - Column index (0-2)
+         */
         async function cellClick(row, col) {
             const state = await makeMove(row, col);
             updateBoard();
         }
 
+        // Initialize the board when the page loads
         window.onload = updateBoard;
     </script>
 </head>
 <body>
     <h1>Tic-Tac-Toe</h1>
+    
+    <!-- Game board: 3x3 grid of clickable buttons -->
     <div id="game-board">
         <table>
             {% for r in range(3) %}
@@ -62,7 +96,11 @@
             {% endfor %}
         </table>
     </div>
+    
+    <!-- Display current player or game result -->
     <div id="current-player"></div>
+    
+    <!-- Reset button to start a new game -->
     <button onclick="resetGame()">Reset</button>
 </body>
 </html>
